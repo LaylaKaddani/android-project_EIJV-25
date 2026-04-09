@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">android-project_EIJV-25</string>
+    <string name="title_activity_main">MainActivity</string>
+    <string name="title_activity_maps">MapsActivity</string>
 </resources>
