@@ -1,5 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- Couleur principale (orange-rouge comme dans la maquette) -->
+    <color name="primary">#E04020</color>
+    <color name="primary_dark">#C03010</color>
+
+    <!-- Arrière-plans -->
+    <color name="background">#F5F5F5</color>
+
+    <!-- Textes -->
+    <color name="text_primary">#1A1A1A</color>
+    <color name="text_secondary">#888888</color>
+
+    <!-- États -->
+    <color name="error">#D32F2F</color>
+    <color name="success">#388E3C</color>
+
+
     <color name="purple_200">#FFBB86FC</color>
     <color name="purple_500">#FF6200EE</color>
     <color name="purple_700">#FF3700B3</color>
