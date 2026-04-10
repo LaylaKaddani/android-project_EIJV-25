@@ -1,5 +1,39 @@
 <resources>
-    <string name="app_name">android-project_EIJV-25</string>
+    <string name="app_name">GeoEvent</string>
+    <string name="subtitle_login">Connectez-vous pour continuer</string>
+
+    <!-- Champs -->
+    <string name="hint_email">Adresse e-mail</string>
+    <string name="hint_password">Mot de passe</string>
+    <string name="hint_confirm_password">Confirmer le mot de passe</string>
+
+    <!-- Boutons -->
+    <string name="btn_login">Se connecter</string>
+    <string name="btn_login_loading">Connexion…</string>
+    <string name="btn_register">S\'inscrire</string>
+    <string name="btn_register_submit">Créer mon compte</string>
+    <string name="btn_register_loading">Création…</string>
+
+    <!-- Dialog inscription -->
+    <string name="dialog_register_title">Créer un compte</string>
+
+    <!-- Messages -->
+    <string name="msg_register_success">✓ Inscription réussie ! Vous pouvez maintenant vous connecter.</string>
+    <string name="toast_welcome">Bienvenue !</string>
+    <string name="error_invalid_email">Adresse e-mail invalide.</string>
+    <string name="error_empty_fields">Ce champ est obligatoire.</string>
+    <string name="error_passwords_not_match">Les mots de passe ne correspondent pas.</string>
+    <string name="error_password_too_short">Le mot de passe doit contenir au moins 6 caractères.</string>
+    <string name="error_user_not_found">Aucun compte trouvé. Veuillez vous inscrire.</string>
+    <string name="error_wrong_password">Mot de passe incorrect.</string>
+    <string name="error_email_already_used">Cette adresse e-mail est déjà utilisée.</string>
+    <string name="error_generic">Une erreur est survenue. Veuillez réessayer.</string>
+
+    <!-- Accessibilité -->
+    <string name="desc_profile_icon">Icône de profil</string>
+    <string name="desc_close">Fermer</string>
+
+<!--    <string name="app_name">android-project_EIJV-25</string>-->
     <string name="title_activity_main">MainActivity</string>
     <string name="title_activity_maps">MapsActivity</string>
 </resources>

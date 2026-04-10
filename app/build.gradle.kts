@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.google.android.libraries.mapsplatform.secrets.gradle.plugin)
+    id("com.google.gms.google-services")
 }
 
 android {
@@ -14,7 +15,8 @@ android {
     defaultConfig {
         applicationId = "com.example.android_project_eijv_25"
         minSdk = 29
-        targetSdk = 36
+//        targetSdk = 36
+        targetSdk = 34
         versionCode = 1
         versionName = "1.0"
 
@@ -40,7 +42,6 @@ android {
 }
 
 dependencies {
-    implementation("org.osmdroid:osmdroid-android:6.1.18")
     implementation(libs.appcompat)
     implementation(libs.material)
     implementation(libs.play.services.maps)
@@ -49,4 +50,12 @@ dependencies {
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
+    // Firebase BoM
+    implementation(platform("com.google.firebase:firebase-bom:34.11.0"))
+
+    // Firebase Auth
+    implementation("com.google.firebase:firebase-auth")
+
+    // Firebase Analytics
+    implementation("com.google.firebase:firebase-analytics")
 }
