@@ -47,6 +47,7 @@ dependencies {
     implementation(libs.play.services.maps)
     implementation(libs.constraintlayout)
     implementation(libs.activity)
+    implementation(libs.firebase.firestore)
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
