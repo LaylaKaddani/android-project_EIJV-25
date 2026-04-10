@@ -33,10 +33,11 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         mapFragment.getMapAsync(this);
     }
 
+
     @Override
     public void onMapReady(@NonNull GoogleMap googleMap) {
         googleMap.addMarker(new MarkerOptions()
-                .position(new LatLng(48.864716, 2.349014))
+                .position(new LatLng(120, 10))
                 .title("Paris"));
     }
 }
