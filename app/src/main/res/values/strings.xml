@@ -10,7 +10,7 @@
     <!-- Boutons -->
     <string name="btn_login">Se connecter</string>
     <string name="btn_login_loading">Connexion…</string>
-    <string name="btn_register">S\'inscrire</string>
+    <string name="btn_register">Sinscrire</string>
     <string name="btn_register_submit">Créer mon compte</string>
     <string name="btn_register_loading">Création…</string>
 
