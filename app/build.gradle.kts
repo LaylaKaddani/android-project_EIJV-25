@@ -48,10 +48,12 @@ dependencies {
     implementation(libs.constraintlayout)
     implementation(libs.activity)
     implementation(libs.firebase.firestore)
+    implementation(libs.firebase.storage)
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
     // Firebase BoM
+    //implementation(platform("com.google.firebase:firebase-bom:34.12.0"))
     implementation(platform("com.google.firebase:firebase-bom:34.12.0"))
 
     // Firebase Auth
@@ -59,4 +61,8 @@ dependencies {
 
     // Firebase Analytics
     implementation(libs.firebase.analytics)
+
+    // Glide pour le chargement des images
+    implementation("com.github.bumptech.glide:glide:5.0.7")
+    annotationProcessor("com.github.bumptech.glide:compiler:5.0.7")
 }

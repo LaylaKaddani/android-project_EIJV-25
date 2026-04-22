@@ -54,15 +54,15 @@ public class AuthActivity extends AppCompatActivity {
         setupListeners();
     }
 
-    @Override
-    protected void onStart() {
-        super.onStart();
-        // Si un utilisateur est déjà connecté, on redirige directement vers MainActivity
-        FirebaseUser currentUser = mAuth.getCurrentUser();
-        if (currentUser != null) {
-            navigateToMain();
-        }
-    }
+//    @Override
+//    protected void onStart() {
+//        super.onStart();
+//        // Si un utilisateur est déjà connecté, on redirige directement vers MainActivity
+//        FirebaseUser currentUser = mAuth.getCurrentUser();
+//        if (currentUser != null) {
+//            navigateToMain();
+//        }
+//    }
 
     // ── Initialisation des vues ───────────────────────────────────────────────
 

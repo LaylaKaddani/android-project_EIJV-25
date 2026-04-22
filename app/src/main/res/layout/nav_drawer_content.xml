@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/nav_drawer"
+    android:layout_width="280dp"
+    android:layout_height="match_parent"
+    android:layout_gravity="start"
+    android:background="@color/drawer_background"
+    android:orientation="vertical">
+
+    <!-- En-tête avec bouton fermer -->
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:background="@color/primary"
+        android:paddingHorizontal="16dp">
+
+        <ImageButton
+            android:id="@+id/btnCloseDrawer"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_centerVertical="true"
+            android:layout_alignParentStart="true"
+            android:src="@android:drawable/ic_menu_close_clear_cancel"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/desc_close"
+            app:tint="@color/white" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:text="@string/app_name"
+            android:textColor="@color/white"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+    </RelativeLayout>
+
+    <TextView
+        android:id="@+id/menuAccueil"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:text="@string/menu_accueil"
+        android:textColor="@color/text_primary"
+        android:textSize="16sp"
+        android:gravity="center_vertical"
+        android:paddingHorizontal="24dp"
+        android:background="?attr/selectableItemBackground"
+        android:drawableStart="@android:drawable/ic_menu_mapmode"
+        android:drawablePadding="16dp" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/divider"
+        android:layout_marginHorizontal="16dp" />
+
+    <TextView
+        android:id="@+id/menuMesEvenements"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:text="@string/menu_mes_evenements"
+        android:textColor="@color/text_primary"
+        android:textSize="16sp"
+        android:gravity="center_vertical"
+        android:paddingHorizontal="24dp"
+        android:background="?attr/selectableItemBackground"
+        android:drawableStart="@android:drawable/ic_menu_agenda"
+        android:drawablePadding="16dp" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/divider"
+        android:layout_marginHorizontal="16dp" />
+
+    <TextView
+        android:id="@+id/menuAPropos"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:text="@string/menu_a_propos"
+        android:textColor="@color/text_primary"
+        android:textSize="16sp"
+        android:gravity="center_vertical"
+        android:paddingHorizontal="24dp"
+        android:background="?attr/selectableItemBackground"
+        android:drawableStart="@android:drawable/ic_menu_info_details"
+        android:drawablePadding="16dp" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/divider" />
+
+    <TextView
+        android:id="@+id/menuDeconnecter"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:text="@string/menu_deconnecter"
+        android:textColor="@color/error"
+        android:textSize="16sp"
+        android:gravity="center_vertical"
+        android:paddingHorizontal="24dp"
+        android:background="?attr/selectableItemBackground"
+        android:drawableStart="@android:drawable/ic_menu_revert"
+        android:drawablePadding="16dp" />
+
+</LinearLayout>
