@@ -1,23 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">GeoEvent</string>
     <string name="subtitle_login">Connectez-vous pour continuer</string>
 
-    <!-- Champs -->
+    <!-- Champs Auth -->
     <string name="hint_email">Adresse e-mail</string>
     <string name="hint_password">Mot de passe</string>
     <string name="hint_confirm_password">Confirmer le mot de passe</string>
 
-    <!-- Boutons -->
+    <!-- Boutons Auth -->
     <string name="btn_login">Se connecter</string>
     <string name="btn_login_loading">Connexion…</string>
-    <string name="btn_register">Sinscrire</string>
+    <string name="btn_register">S\'inscrire</string>
     <string name="btn_register_submit">Créer mon compte</string>
     <string name="btn_register_loading">Création…</string>
 
-    <!-- Dialog inscription -->
+    <!-- Auth messages -->
     <string name="dialog_register_title">Créer un compte</string>
-
-    <!-- Messages -->
     <string name="msg_register_success">✓ Inscription réussie ! Vous pouvez maintenant vous connecter.</string>
     <string name="toast_welcome">Bienvenue !</string>
     <string name="error_invalid_email">Adresse e-mail invalide.</string>
@@ -29,17 +28,93 @@
     <string name="error_email_already_used">Cette adresse e-mail est déjà utilisée.</string>
     <string name="error_generic">Une erreur est survenue. Veuillez réessayer.</string>
 
+    <!-- Menu tiroir -->
+    <string name="menu_accueil">Accueil</string>
+    <string name="menu_mes_evenements">Mes événements</string>
+    <string name="menu_a_propos">À propos de nous</string>
+    <string name="menu_deconnecter">Se déconnecter</string>
+
+    <!-- Filtre distance -->
+    <string name="filter_all">Filtrer par distance</string>
+
+    <!-- Titres activités -->
+    <string name="title_mes_evenements">Mes événements</string>
+    <string name="title_pick_location">Choisir un emplacement</string>
+
+    <!-- Événements - labels -->
+    <string name="label_titre">Titre</string>
+    <string name="label_description">Description</string>
+    <string name="label_adresse">Adresse</string>
+    <string name="label_date_debut">Date de début</string>
+    <string name="label_date_fin">Date de fin</string>
+    <string name="label_image">Image</string>
+    <string name="label_created_by">Créé par</string>
+    <string name="label_created_at">Créé le</string>
+
+    <!-- Événements - boutons -->
+    <string name="btn_add_event">Ajouter +</string>
+    <string name="btn_pick_location">Choisir sur la carte</string>
+    <string name="btn_pick_image">Choisir une image</string>
+    <string name="btn_annuler">Annuler</string>
+    <string name="btn_ajouter">Ajouter</string>
+    <string name="btn_sauvegarder">Sauvegarder</string>
+    <string name="btn_effacer">Effacer</string>
+    <string name="btn_modifier">Modifier</string>
+    <string name="btn_oui">Oui</string>
+    <string name="btn_non">Non</string>
+    <string name="btn_confirmer_location">Confirmer cet emplacement</string>
+
+    <!-- Événements - messages -->
+    <string name="msg_no_events">Vous n\'avez pas encore créé d\'événement.</string>
+    <string name="msg_event_added">Événement ajouté avec succès !</string>
+    <string name="msg_event_updated">Événement modifié avec succès !</string>
+    <string name="msg_event_deleted">Événement supprimé.</string>
+    <string name="confirm_delete_event">Êtes-vous sûr de vouloir supprimer cet événement ?</string>
+    <string name="no_image_selected">Aucune image sélectionnée</string>
+    <string name="image_already_set">Image existante (toucher pour changer)</string>
+    <string name="hint_adresse_auto">Rempli automatiquement</string>
+    <string name="hint_date">JJ/MM/AAAA</string>
+    <string name="hint_search_event">Rechercher un événement</string>
+    <string name="instruction_long_press">Appuyez longuement sur la carte pour placer un marqueur</string>
+    <string name="marker_selected_location">Emplacement sélectionné</string>
+
+    <!-- Dialogues -->
+    <string name="dialog_add_event_title">Ajouter un événement</string>
+    <string name="dialog_edit_event_title">Modifier l\'événement</string>
+
+    <!-- Erreurs événements -->
+    <string name="error_load_events">Impossible de charger les événements.</string>
+    <string name="error_event_not_found">Événement introuvable.</string>
+    <string name="error_field_titre">Le titre est obligatoire.</string>
+    <string name="error_field_location">Veuillez choisir une localisation.</string>
+    <string name="error_field_date">La date de début est obligatoire.</string>
+    <string name="error_upload_image">Échec du téléchargement de l\'image.</string>
+    <string name="error_geocode">Impossible de récupérer l\'adresse.</string>
+
+    <!-- À propos -->
+    <string name="about_version">Version 1.0</string>
+    <string name="about_description">GeoEvent est une application communautaire permettant de partager et découvrir des événements géolocalisés autour de vous.</string>
+    <string name="about_team_title">Équipe de développement</string>
+    <string name="about_team_members">• Membre 1\n• Membre 2\n• Membre 3</string>
+
     <!-- Accessibilité -->
     <string name="desc_profile_icon">Icône de profil</string>
     <string name="desc_close">Fermer</string>
+    <string name="desc_menu">Menu</string>
 
-<!--    <string name="app_name">android-project_EIJV-25</string>-->
-    <string name="title_activity_main">MainActivity</string>
-    <string name="title_activity_maps">MapsActivity</string>
+    <!-- Arrays (garder la compatibilité) -->
+    <string-array name="menu_carte">
+        <item>Accueil</item>
+        <item>Mes événements</item>
+        <item>À propos de nous</item>
+        <item>Se déconnecter</item>
+    </string-array>
 
-    <string-array name="options_carte">
-        <item>Afficher ma position</item>
-        <item>Ajouter une activité</item>
-        <item>Supprimer une activité</item>
+    <string-array name="filter_distance_options">
+        <item>Tous les événements</item>
+        <item>1 – 5 km</item>
+        <item>5 – 10 km</item>
+        <item>10 – 15 km</item>
+        <item>15 – 30 km</item>
     </string-array>
 </resources>
