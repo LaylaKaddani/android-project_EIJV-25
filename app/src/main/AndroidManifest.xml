@@ -5,13 +5,8 @@
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.READ_MEDIA_IMAGES"/>
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
-
-    <!-- Permissions (à la racine du manifeste) -->
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" /> <!-- pour la géolocalisation plus tard -->
-
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
 
     <application
         android:allowBackup="true"
@@ -27,18 +22,18 @@
             android:name="com.google.android.geo.API_KEY"
             android:value="${MAPS_API_KEY}" />
 
-        <!-- Launcher Activity -->
         <activity android:name=".AuthActivity" android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".MainActivity" android:exported="true"/>
-        <activity android:name=".ListEvenementActivity" android:exported="true"/>
-        <activity android:name=".DetailEvenementActivity" android:exported="true"/>
-        <activity android:name=".SelectLocationActivity" android:exported="true"/>
-        <activity android:name=".AProposActivity" android:exported="true"/>
+        <activity android:name=".MainActivity" android:exported="false"/>
+        <activity android:name=".ListEvenementActivity" android:exported="false"/>
+        <activity android:name=".DetailEvenementActivity" android:exported="false"/>
+        <activity android:name=".SelectLocationActivity" android:exported="false"/>
+        <activity android:name=".AProposActivity" android:exported="false"/>
+
     </application>
 
 </manifest>
