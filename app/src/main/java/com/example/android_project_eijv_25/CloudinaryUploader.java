@@ -20,6 +20,8 @@ public class CloudinaryUploader {
 
     private static final String CLOUD_NAME   = "dikikeoex";
     private static final String UPLOAD_PRESET = "geoevent_upload";
+
+
     private static final String UPLOAD_URL =
             "https://api.cloudinary.com/v1_1/" + CLOUD_NAME + "/image/upload";
 

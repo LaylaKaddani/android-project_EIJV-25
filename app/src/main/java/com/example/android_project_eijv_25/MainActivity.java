@@ -24,6 +24,12 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
+import android.Manifest;
+import android.content.pm.PackageManager;
+import android.location.Location;
+import androidx.core.app.ActivityCompat;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
 
 import java.util.Objects;
 
@@ -34,7 +40,14 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private FirebaseFirestore db;
     private FirebaseAuth mAuth;
     private double filterDistanceKm = -1; // -1 = pas de filtre
-    private LatLng userLocation = new LatLng(49.894067, 2.295753); // Amiens par défaut
+    //private LatLng userLocation = new LatLng(49.894067, 2.295753); // Amiens par défaut
+    //  pour localisation personel
+    private LatLng userLocation = new LatLng(49.894067, 2.295753); // valeur par défaut si GPS indisponible
+    private FusedLocationProviderClient fusedLocationClient;
+    private static final int LOCATION_PERMISSION_REQUEST = 1001;
+
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,6 +63,16 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         initDistanceFilter();
         initMap();
         initFab();
+
+        //  pour perso localisation
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+        //requestLocationPermission();
+        ActivityCompat.requestPermissions(this,
+                new String[]{
+                        Manifest.permission.ACCESS_FINE_LOCATION,
+                        Manifest.permission.ACCESS_COARSE_LOCATION  //
+                },
+                LOCATION_PERMISSION_REQUEST);
     }
 
     // ── Toolbar ───────────────────────────────────────────────────────────────
@@ -197,4 +220,46 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         super.onResume();
         if (mMap != null) loadEventsOnMap();
     }
+    // Ajoute ces méthodes :
+    private void requestLocationPermission() {
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                    LOCATION_PERMISSION_REQUEST);
+        } else {
+            getUserLocation();
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == LOCATION_PERMISSION_REQUEST) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                getUserLocation();
+            } else {
+                Toast.makeText(this, "Permission GPS refusée, position par défaut utilisée",
+                        Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
+    private void getUserLocation() {
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED) return;
+
+        fusedLocationClient.getLastLocation()
+                .addOnSuccessListener(location -> {
+                    if (location != null) {
+                        userLocation = new LatLng(location.getLatitude(), location.getLongitude());
+                        if (mMap != null) {
+                            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(userLocation, 12));
+                            mMap.setMyLocationEnabled(true);
+                            loadEventsOnMap();
+                        }
+                    }
+                });
+    }
 }
+

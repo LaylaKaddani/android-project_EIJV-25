@@ -65,4 +65,7 @@ dependencies {
     // Glide pour le chargement des images
     implementation("com.github.bumptech.glide:glide:5.0.7")
     annotationProcessor("com.github.bumptech.glide:compiler:5.0.7")
+
+    // GPS / Localisation
+    implementation("com.google.android.gms:play-services-location:21.0.1")
 }
