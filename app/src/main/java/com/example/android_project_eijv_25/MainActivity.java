@@ -238,10 +238,12 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         if (requestCode == LOCATION_PERMISSION_REQUEST) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 getUserLocation();
-            } else {
-                Toast.makeText(this, "Permission GPS refusée, position par défaut utilisée",
-                        Toast.LENGTH_SHORT).show();
-            }
+            }  else {
+            Toast.makeText(this, "Veuillez choisir votre position manuellement",
+                    Toast.LENGTH_SHORT).show();
+            Intent intent = new Intent(this, SelectLocationActivity.class);
+            startActivityForResult(intent, LOCATION_PERMISSION_REQUEST);
+        }
         }
     }
 
@@ -260,6 +262,22 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                         }
                     }
                 });
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == LOCATION_PERMISSION_REQUEST
+                && resultCode == RESULT_OK
+                && data != null) {
+            double lat = data.getDoubleExtra("latitude", 49.894067);
+            double lng = data.getDoubleExtra("longitude", 2.295753);
+            userLocation = new LatLng(lat, lng);
+            if (mMap != null) {
+                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(userLocation, 12));
+                loadEventsOnMap();
+            }
+        }
     }
 }
 
