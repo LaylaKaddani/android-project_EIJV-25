@@ -1,19 +1,21 @@
 package com.example.android_project_eijv_25;
 
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.view.Gravity;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
+import androidx.core.app.ActivityCompat;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -24,30 +26,22 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
-import android.Manifest;
-import android.content.pm.PackageManager;
-import android.location.Location;
-import androidx.core.app.ActivityCompat;
-import com.google.android.gms.location.FusedLocationProviderClient;
-import com.google.android.gms.location.LocationServices;
 
 import java.util.Objects;
 
 public class MainActivity extends AppCompatActivity implements OnMapReadyCallback {
 
+    private static final int REQUEST_LOCATION_PERMISSION = 1001;
+    private static final int REQUEST_MANUAL_LOCATION    = 1002;
+
     private DrawerLayout drawerLayout;
     private GoogleMap mMap;
     private FirebaseFirestore db;
     private FirebaseAuth mAuth;
-    private double filterDistanceKm = -1; // -1 = pas de filtre
-    //private LatLng userLocation = new LatLng(49.894067, 2.295753); // Amiens par défaut
-    //  pour localisation personel
-    private LatLng userLocation = new LatLng(49.894067, 2.295753); // valeur par défaut si GPS indisponible
     private FusedLocationProviderClient fusedLocationClient;
-    private static final int LOCATION_PERMISSION_REQUEST = 1001;
 
-
-
+    private double filterDistanceKm = -1;
+    private LatLng userLocation = new LatLng(49.894067, 2.295753); // Amiens par défaut
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,6 +51,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         db = FirebaseFirestore.getInstance();
         mAuth = FirebaseAuth.getInstance();
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 
         initToolbar();
         initDrawer();
@@ -64,26 +59,18 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         initMap();
         initFab();
 
-        //  pour perso localisation
-        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
-        //requestLocationPermission();
-        ActivityCompat.requestPermissions(this,
-                new String[]{
-                        Manifest.permission.ACCESS_FINE_LOCATION,
-                        Manifest.permission.ACCESS_COARSE_LOCATION  //
-                },
-                LOCATION_PERMISSION_REQUEST);
+        // demander la permission GPS
+        requestLocationPermission();
     }
 
     // ── Toolbar ───────────────────────────────────────────────────────────────
 
     private void initToolbar() {
-        Toolbar toolbar = findViewById(R.id.toolbar);
         findViewById(R.id.btnMenu).setOnClickListener(v ->
                 drawerLayout.openDrawer(GravityCompat.START));
     }
 
-    // ── Drawer (menu hamburger) ───────────────────────────────────────────────
+    // ── Drawer ────────────────────────────────────────────────────────────────
 
     private void initDrawer() {
         drawerLayout = findViewById(R.id.drawer_layout);
@@ -123,11 +110,11 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         spinner.setAdapter(adapter);
         spinner.setOnItemClickListener((parent, view, position, id) -> {
             switch (position) {
-                case 0: filterDistanceKm = -1;  break; // Tous
-                case 1: filterDistanceKm = 5;   break; // 1-5 km
-                case 2: filterDistanceKm = 10;  break; // 5-10 km
-                case 3: filterDistanceKm = 15;  break; // 10-15 km
-                case 4: filterDistanceKm = 30;  break; // 15-30 km
+                case 0: filterDistanceKm = -1;  break;
+                case 1: filterDistanceKm = 5;   break;
+                case 2: filterDistanceKm = 10;  break;
+                case 3: filterDistanceKm = 15;  break;
+                case 4: filterDistanceKm = 30;  break;
             }
             if (mMap != null) loadEventsOnMap();
         });
@@ -148,7 +135,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(userLocation, 12));
         loadEventsOnMap();
 
-        // Clic sur un marqueur → afficher détails
         mMap.setOnMarkerClickListener(marker -> {
             String eventId = (String) marker.getTag();
             if (eventId != null) {
@@ -173,9 +159,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
                         LatLng pos = new LatLng(lat, lng);
 
-                        // Filtrage par distance si actif
                         if (filterDistanceKm > 0) {
-                            double dist = distanceKm(userLocation.latitude, userLocation.longitude, lat, lng);
+                            double dist = distanceKm(
+                                    userLocation.latitude, userLocation.longitude, lat, lng);
                             if (dist > filterDistanceKm) continue;
                         }
 
@@ -190,10 +176,10 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     }
                 })
                 .addOnFailureListener(e ->
-                        Toast.makeText(this, getString(R.string.error_load_events), Toast.LENGTH_SHORT).show());
+                        Toast.makeText(this, getString(R.string.error_load_events),
+                                Toast.LENGTH_SHORT).show());
     }
 
-    // ── FAB ajouter événement ─────────────────────────────────────────────────
 
     private void initFab() {
         findViewById(R.id.fabAddEvent).setOnClickListener(v -> {
@@ -203,7 +189,118 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         });
     }
 
-    // ── Utilitaire : calcul distance (Haversine) ──────────────────────────────
+    // ── GPS :  demander la permission ────────────────────────────────
+
+
+    private void requestLocationPermission() {
+        // Permission déjà accordée
+        if (ActivityCompat.checkSelfPermission(this,
+                Manifest.permission.ACCESS_FINE_LOCATION)
+                == PackageManager.PERMISSION_GRANTED) {
+            getUserLocation();
+            return;
+        }
+
+        // Permission déjà refusée une fois
+        if (ActivityCompat.shouldShowRequestPermissionRationale(this,
+                Manifest.permission.ACCESS_FINE_LOCATION)) {
+            new androidx.appcompat.app.AlertDialog.Builder(this)
+                    .setTitle("Permission GPS")
+                    .setMessage("La localisation permet de filtrer les événements près de vous. Voulez-vous l'activer ?")
+                    .setPositiveButton("Oui", (dialog, which) ->
+                            ActivityCompat.requestPermissions(this,
+                                    new String[]{
+                                            Manifest.permission.ACCESS_FINE_LOCATION,
+                                            Manifest.permission.ACCESS_COARSE_LOCATION
+                                    },
+                                    REQUEST_LOCATION_PERMISSION))
+                    .setNegativeButton("Non, choisir manuellement", (dialog, which) -> {
+                        Intent intent = new Intent(this, SelectLocationActivity.class);
+                        startActivityForResult(intent, REQUEST_MANUAL_LOCATION);
+                    })
+                    .show();
+            return;
+        }
+
+        // Première fois  afficher la popup Android normale
+        ActivityCompat.requestPermissions(this,
+                new String[]{
+                        Manifest.permission.ACCESS_FINE_LOCATION,
+                        Manifest.permission.ACCESS_COARSE_LOCATION
+                },
+                REQUEST_LOCATION_PERMISSION);
+    }
+
+    // ── GPS : résultat de la popup ─────────────────────────────────
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode,
+                                           @NonNull String[] permissions,
+                                           @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode != REQUEST_LOCATION_PERMISSION) return;
+
+        if (grantResults.length > 0
+                && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            // Précis ou approximatif → on récupère la vraie position
+            getUserLocation();
+        } else {
+            // Refusé → ouvrir la carte pour choisir manuellement
+            Toast.makeText(this,
+                    "GPS refusé. Veuillez choisir votre position manuellement.",
+                    Toast.LENGTH_LONG).show();
+            Intent intent = new Intent(this, SelectLocationActivity.class);
+            startActivityForResult(intent, REQUEST_MANUAL_LOCATION);
+        }
+    }
+
+    // ── GPS :  récupérer la vraie position ───────────────────────────
+
+    private void getUserLocation() {
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED
+                && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED) return;
+
+        fusedLocationClient.getLastLocation()
+                .addOnSuccessListener(location -> {
+                    if (location != null) {
+                        userLocation = new LatLng(
+                                location.getLatitude(), location.getLongitude());
+                    }
+                    //  on met à jour la carte
+                    if (mMap != null) {
+                        mMap.moveCamera(CameraUpdateFactory
+                                .newLatLngZoom(userLocation, 12));
+                        if (ActivityCompat.checkSelfPermission(this,
+                                Manifest.permission.ACCESS_FINE_LOCATION)
+                                == PackageManager.PERMISSION_GRANTED) {
+                            mMap.setMyLocationEnabled(true);
+                        }
+                        loadEventsOnMap();
+                    }
+                });
+    }
+
+    // ── sélection manuelle ───────────────────────────────────────────
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == REQUEST_MANUAL_LOCATION
+                && resultCode == RESULT_OK
+                && data != null) {
+            double lat = data.getDoubleExtra("latitude", 49.894067);
+            double lng = data.getDoubleExtra("longitude", 2.295753);
+            userLocation = new LatLng(lat, lng);
+            if (mMap != null) {
+                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(userLocation, 12));
+                loadEventsOnMap();
+            }
+        }
+    }
+
+    // ──  calcul distance ───────────────────────────────────────────
 
     private double distanceKm(double lat1, double lon1, double lat2, double lon2) {
         final int R = 6371;
@@ -220,64 +317,4 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         super.onResume();
         if (mMap != null) loadEventsOnMap();
     }
-    // Ajoute ces méthodes :
-    private void requestLocationPermission() {
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
-                != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this,
-                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
-                    LOCATION_PERMISSION_REQUEST);
-        } else {
-            getUserLocation();
-        }
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode == LOCATION_PERMISSION_REQUEST) {
-            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                getUserLocation();
-            }  else {
-            Toast.makeText(this, "Veuillez choisir votre position manuellement",
-                    Toast.LENGTH_SHORT).show();
-            Intent intent = new Intent(this, SelectLocationActivity.class);
-            startActivityForResult(intent, LOCATION_PERMISSION_REQUEST);
-        }
-        }
-    }
-
-    private void getUserLocation() {
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
-                != PackageManager.PERMISSION_GRANTED) return;
-
-        fusedLocationClient.getLastLocation()
-                .addOnSuccessListener(location -> {
-                    if (location != null) {
-                        userLocation = new LatLng(location.getLatitude(), location.getLongitude());
-                        if (mMap != null) {
-                            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(userLocation, 12));
-                            mMap.setMyLocationEnabled(true);
-                            loadEventsOnMap();
-                        }
-                    }
-                });
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == LOCATION_PERMISSION_REQUEST
-                && resultCode == RESULT_OK
-                && data != null) {
-            double lat = data.getDoubleExtra("latitude", 49.894067);
-            double lng = data.getDoubleExtra("longitude", 2.295753);
-            userLocation = new LatLng(lat, lng);
-            if (mMap != null) {
-                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(userLocation, 12));
-                loadEventsOnMap();
-            }
-        }
-    }
 }
-
