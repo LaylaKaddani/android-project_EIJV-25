@@ -13,3 +13,25 @@
 .externalNativeBuild
 .cxx
 local.properties
+
+# Secrets & API Keys
+google-services.json
+secrets.properties
+api_keys.properties
+keystore.properties
+cloudinary.properties
+.env
+.env.local
+
+# Keystores
+*.jks
+*.keystore
+*.p12
+*.pfx
+
+# APK / AAB
+*.apk
+*.aab
+
+# Logs
+*.log

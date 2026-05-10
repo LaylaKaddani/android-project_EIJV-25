@@ -102,6 +102,10 @@
     <string name="desc_close">Fermer</string>
     <string name="desc_menu">Menu</string>
 
+<!-- pour la  sécurité je doit verifier quelque chose-->
+    <string name="cloudinary_cloud_name">dikikeoex</string>
+    <string name="cloudinary_upload_preset">geoevent_upload</string>
+
     <!-- Arrays (garder la compatibilité) -->
     <string-array name="menu_carte">
         <item>Accueil</item>
