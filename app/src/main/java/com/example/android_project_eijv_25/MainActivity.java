@@ -17,8 +17,10 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
-import com.google.android.gms.location.CurrentLocationRequest;
 import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationCallback;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.Priority;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -48,6 +50,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private FirebaseFirestore db;
     private FirebaseAuth mAuth;
     private FusedLocationProviderClient fusedLocationClient;
+    private LocationCallback locationCallback;
 
     private double filterDistanceKm = -1;
     private LatLng userLocation = null;
@@ -149,9 +152,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         mMap.setOnMarkerClickListener(marker -> {
             if ("user_position".equals(marker.getTag())) {
-                // Clic marqueur bleu → dialog avec adresse + options
+                // Clic marqueur bleu → dialog adresse + options
                 showUserMarkerOptions();
-                return true; // empêche l'info window de s'ouvrir
+                return true;
             }
             // Clic événement rouge → détails
             String eventId = (String) marker.getTag();
@@ -170,8 +173,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         if (mMap == null || userLocation == null) return;
         if (userMarker != null) userMarker.remove();
 
-        // PAS de titre → empêche l'info window de s'ouvrir au clic
-        // Le dialog s'ouvre directement via setOnMarkerClickListener
+        // Pas de titre → dialog s'ouvre directement au clic
         userMarker = mMap.addMarker(new MarkerOptions()
                 .position(userLocation)
                 .icon(BitmapDescriptorFactory.defaultMarker(
@@ -189,18 +191,15 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 ? geocodeAddress(userLocation.latitude, userLocation.longitude)
                 : "Position inconnue";
 
-        // Solution : adresse dans le TITRE, options dans setItems
-        // setMessage + setItems ne fonctionnent pas ensemble !
         new AlertDialog.Builder(this)
                 .setTitle("📍 Ma position")
-                .setMessage(adresse)  // adresse visible
+                .setMessage(adresse)
                 .setPositiveButton("🗺️ Choisir manuellement", (dialog, which) -> {
                     Intent intent = new Intent(this, SelectLocationActivity.class);
                     startActivityForResult(intent, REQUEST_MANUAL_LOCATION);
                 })
-                .setNeutralButton("📡 Relocaliser GPS", (dialog, which) -> {
-                    getUserLocation();
-                })
+                .setNeutralButton("📡 Relocaliser GPS", (dialog, which) ->
+                        getUserLocation())
                 .setNegativeButton("Annuler", null)
                 .show();
     }
@@ -327,7 +326,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
     }
 
-    // ── GPS étape 3 : position fraîche ────────────────────────────────────────
+    // ── GPS étape 3 : getLastLocation (cache) puis requestLocationUpdates ─────
 
     private void getUserLocation() {
         if (ActivityCompat.checkSelfPermission(this,
@@ -337,42 +336,66 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 Manifest.permission.ACCESS_COARSE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED) return;
 
-        CurrentLocationRequest request = new CurrentLocationRequest.Builder()
-                .setPriority(Priority.PRIORITY_HIGH_ACCURACY)
-                .setMaxUpdateAgeMillis(0)
-                .setDurationMillis(15000)
+        // Essayer le cache d'abord (instantané)
+        fusedLocationClient.getLastLocation()
+                .addOnSuccessListener(lastLocation -> {
+                    if (lastLocation != null) {
+                        userLocation = new LatLng(
+                                lastLocation.getLatitude(),
+                                lastLocation.getLongitude());
+                        updateMapWithUserLocation();
+                    }
+                    // Dans tous les cas → demander position fraîche
+                    startLocationUpdates();
+                })
+                .addOnFailureListener(e -> startLocationUpdates());
+    }
+
+    // ── GPS : forcer position fraîche via LocationUpdates ────────────────────
+
+    private void startLocationUpdates() {
+        if (ActivityCompat.checkSelfPermission(this,
+                Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED
+                && ActivityCompat.checkSelfPermission(this,
+                Manifest.permission.ACCESS_COARSE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED) return;
+
+        LocationRequest locationRequest = new LocationRequest.Builder(
+                Priority.PRIORITY_HIGH_ACCURACY, 5000)
+                .setMinUpdateIntervalMillis(2000)
+                .setMaxUpdates(1) // une seule position suffit
                 .build();
 
-        fusedLocationClient.getCurrentLocation(request, null)
-                .addOnSuccessListener(location -> {
-                    if (location != null) {
-                        userLocation = new LatLng(
-                                location.getLatitude(), location.getLongitude());
-                        if (mMap != null) {
-                            mMap.moveCamera(CameraUpdateFactory
-                                    .newLatLngZoom(userLocation, 15));
-                            if (ActivityCompat.checkSelfPermission(this,
-                                    Manifest.permission.ACCESS_FINE_LOCATION)
-                                    == PackageManager.PERMISSION_GRANTED) {
-                                mMap.setMyLocationEnabled(true);
-                            }
-                            loadEventsOnMap();
-                        }
-                    } else {
-                        Toast.makeText(this,
-                                "GPS indisponible. Choisissez manuellement.",
-                                Toast.LENGTH_LONG).show();
-                        Intent intent = new Intent(this, SelectLocationActivity.class);
-                        startActivityForResult(intent, REQUEST_MANUAL_LOCATION);
-                    }
-                })
-                .addOnFailureListener(e -> {
-                    Toast.makeText(this,
-                            "Erreur GPS. Choisissez manuellement.",
-                            Toast.LENGTH_LONG).show();
-                    Intent intent = new Intent(this, SelectLocationActivity.class);
-                    startActivityForResult(intent, REQUEST_MANUAL_LOCATION);
-                });
+        locationCallback = new LocationCallback() {
+            @Override
+            public void onLocationResult(@NonNull LocationResult result) {
+                android.location.Location location = result.getLastLocation();
+                if (location != null) {
+                    userLocation = new LatLng(
+                            location.getLatitude(), location.getLongitude());
+                    updateMapWithUserLocation();
+                    // Arrêter après avoir eu la position
+                    fusedLocationClient.removeLocationUpdates(locationCallback);
+                }
+            }
+        };
+
+        fusedLocationClient.requestLocationUpdates(
+                locationRequest, locationCallback, getMainLooper());
+    }
+
+    // ── GPS : mettre à jour la carte avec la position ─────────────────────────
+
+    private void updateMapWithUserLocation() {
+        if (mMap == null || userLocation == null) return;
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(userLocation, 15));
+        if (ActivityCompat.checkSelfPermission(this,
+                Manifest.permission.ACCESS_FINE_LOCATION)
+                == PackageManager.PERMISSION_GRANTED) {
+            mMap.setMyLocationEnabled(true);
+        }
+        loadEventsOnMap();
     }
 
     // ── Résultat sélection manuelle ───────────────────────────────────────────
@@ -393,7 +416,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
     }
 
-    // ── Haversine ─────────────────────────────────────────────────────────────
+    // ── Haversine : calcul distance ───────────────────────────────────────────
 
     private double distanceKm(double lat1, double lon1, double lat2, double lon2) {
         final int R = 6371;
@@ -409,5 +432,15 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     protected void onResume() {
         super.onResume();
         if (mMap != null) loadEventsOnMap();
+    }
+
+    // ── Nettoyage : éviter fuite mémoire ─────────────────────────────────────
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (fusedLocationClient != null && locationCallback != null) {
+            fusedLocationClient.removeLocationUpdates(locationCallback);
+        }
     }
 }
