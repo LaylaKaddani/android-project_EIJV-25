@@ -44,16 +44,16 @@ com.example.android_project_eijv_25/
 │   ├── SelectLocationActivity.java    # Sélection manuelle d'une position sur carte
 │   └── AProposActivity.java           # Page À propos
 │
-├── 🧩 Base
+├──  Base
 │   └── BaseDrawerActivity.java        # Classe abstraite : menu tiroir partagé
 │
-├── 📦 Modèles
+├──  Modèles
 │   └── Evenement.java                 # Modèle de données POJO (Firestore)
 │
-├── 🔧 Adapters
+├──  Adapters
 │   └── EvenementAdapter.java          # RecyclerView adapter liste événements
 │
-└── ☁️ Services
+└──  Services
     └── CloudinaryUploader.java        # Upload images Cloudinary (thread séparé)
 ```
 
@@ -112,7 +112,7 @@ com.example.android_project_eijv_25/
 
 Ce projet implémente plusieurs couches de sécurité indépendantes (**Defense in Depth**), principe fondamental en cybersécurité.
 
-### 1. 📋 Permissions runtime GPS
+### 1.  Permissions runtime GPS
 La permission de localisation est demandée dynamiquement à l'utilisateur conformément aux bonnes pratiques Android 6+ (API 23+). Trois scénarios sont gérés :
 - **Accordée (précise)** → vraie position GPS via `getCurrentLocation()`
 - **Accordée (approximative)** → position réseau/WiFi
@@ -123,7 +123,7 @@ Toutes les activités sauf `AuthActivity` sont déclarées `android:exported="fa
 
 **Sans cette mesure**, une application malveillante installée sur le même téléphone pourrait lancer directement `MainActivity` via un Intent explicite, **en contournant totalement l'authentification Firebase**.
 
-### 3. 🔐Firestore Security Rules (protection côté serveur)
+### 3. Firestore Security Rules (protection côté serveur)
 Les règles Firestore protègent la base de données indépendamment du code Android. Même si quelqu'un utilise Postman ou curl directement, les règles s'appliquent :
 
 ```javascript
